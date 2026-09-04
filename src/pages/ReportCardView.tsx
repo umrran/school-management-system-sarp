@@ -60,7 +60,7 @@ export function ReportCardView({ card, onBack }: Props) {
               />
               <div>
                 <h2 className="text-base font-bold uppercase tracking-wider text-[#30369C]">
-                  Terminal Report Sheet
+                  Sarp Educational Complex
                 </h2>
                 <p className="text-[10px] text-[#222222]">Academic Excellence Since 2000</p>
               </div>
