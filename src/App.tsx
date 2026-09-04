@@ -56,10 +56,10 @@ function App() {
           {page === 'students' && <StudentsPage teacherEmail={teacherEmail} />}
           {page === 'teachers' && role === 'admin' && <TeachersPage />}
           {page === 'courses' && <CoursesPage />}
-          {page === 'attendance' && <AttendancePage />}
+          {page === 'attendance' && role === 'admin' && <AttendancePage />}
           {page === 'grades' && <GradesPage teacherEmail={teacherEmail} />}
           {page === 'report-cards' && <ReportCardsPage teacherEmail={teacherEmail} />}
-          {page === 'fees' && <FeesPage teacherEmail={teacherEmail} />}
+          {page === 'fees' && role === 'admin' && <FeesPage teacherEmail={teacherEmail} />}
         </div>
       </main>
     </div>

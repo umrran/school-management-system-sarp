@@ -34,6 +34,9 @@
     background: white !important;
     margin: 0 !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
   .print\:hidden {
     display: none !important;
@@ -55,5 +58,47 @@
   }
   aside, nav, header, footer {
     display: none !important;
+  }
+  @page {
+    size: A4;
+    margin: 0.5cm;
+  }
+  /* Preserve brand colors in print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Force the gold background to print */
+  .bg-\[\#FFD21A\] {
+    background-color: #FFD21A !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Force royal blue backgrounds to print */
+  .bg-\[\#30369C\] {
+    background-color: #30369C !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .bg-\[\#28339A\] {
+    background-color: #28339A !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .bg-\[\#222222\] {
+    background-color: #222222 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .text-\[\#FFD21A\] {
+    color: #FFD21A !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .border-\[\#222222\] {
+    border-color: #222222 !important;
+  }
+  .border-\[\#30369C\] {
+    border-color: #30369C !important;
   }
 }

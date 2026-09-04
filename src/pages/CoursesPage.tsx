@@ -9,23 +9,19 @@ import { BookOpen, Plus, Pencil, Trash2, Search } from 'lucide-react';
 
 type CourseForm = {
   name: string;
-  code: string;
   description: string;
   teacher_id: string;
-  level: string;
   class: string;
 };
 
 const emptyForm: CourseForm = {
   name: '',
-  code: '',
   description: '',
   teacher_id: '',
-  level: '',
   class: '',
 };
 
-const LEVELS = [
+const CLASSES = [
   'Nursery',
   'KG1',
   'KG2',
@@ -76,10 +72,8 @@ export function CoursesPage() {
     setEditing(c);
     setForm({
       name: c.name,
-      code: c.code,
       description: c.description ?? '',
       teacher_id: c.teacher_id ?? '',
-      level: c.level ?? '',
       class: c.class ?? '',
     });
     setModalOpen(true);
@@ -89,16 +83,21 @@ export function CoursesPage() {
     setSaving(true);
     const payload = {
       name: form.name,
-      code: form.code,
+      code: editing?.code ?? `COURSE-${Date.now()}`,
       description: form.description || null,
       teacher_id: form.teacher_id || null,
-      level: form.level || null,
       class: form.class || null,
     };
+    let error;
     if (editing) {
-      await supabase.from('courses').update(payload).eq('id', editing.id);
+      ({ error } = await supabase.from('courses').update(payload).eq('id', editing.id));
     } else {
-      await supabase.from('courses').insert(payload);
+      ({ error } = await supabase.from('courses').insert(payload));
+    }
+    if (error) {
+      setSaving(false);
+      alert(`Could not save course: ${error.message}`);
+      return;
     }
     setSaving(false);
     setModalOpen(false);
@@ -116,7 +115,7 @@ export function CoursesPage() {
     const q = search.toLowerCase();
     return (
       c.name.toLowerCase().includes(q) ||
-      c.code.toLowerCase().includes(q) ||
+      (c.code ?? '').toLowerCase().includes(q) ||
       (c.teacher?.first_name ?? '').toLowerCase().includes(q) ||
       (c.teacher?.last_name ?? '').toLowerCase().includes(q)
     );
@@ -224,13 +223,6 @@ export function CoursesPage() {
                 placeholder="e.g. Algebra II"
               />
             </Field>
-            <Field label="Course Code" required>
-              <TextInput
-                value={form.code}
-                onChange={(e) => setForm({ ...form, code: e.target.value })}
-                placeholder="e.g. MATH-201"
-              />
-            </Field>
           </div>
           <Field label="Description">
             <TextArea
@@ -253,39 +245,24 @@ export function CoursesPage() {
               ))}
             </Select>
           </Field>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Level">
-              <Select
-                value={form.level}
-                onChange={(e) => setForm({ ...form, level: e.target.value })}
-              >
-                <option value="">Select level</option>
-                {LEVELS.map((l) => (
-                  <option key={l} value={l}>
-                    {l}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Class">
-              <Select
-                value={form.class}
-                onChange={(e) => setForm({ ...form, class: e.target.value })}
-              >
-                <option value="">Select class</option>
-                {LEVELS.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-          </div>
+          <Field label="Class">
+            <Select
+              value={form.class}
+              onChange={(e) => setForm({ ...form, class: e.target.value })}
+            >
+              <option value="">Select class</option>
+              {CLASSES.map((className) => (
+                <option key={className} value={className}>
+                  {className}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="secondary" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={save} disabled={saving || !form.name || !form.code}>
+            <Button onClick={save} disabled={saving || !form.name}>
               {saving ? 'Saving...' : 'Save'}
             </Button>
           </div>

@@ -60,7 +60,7 @@ export function Sidebar({ current, onNavigate, className, role, teacherName }: S
 
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems
-          .filter((item) => role === 'admin' || item.id !== 'teachers')
+          .filter((item) => role === 'admin' || !['teachers', 'attendance', 'fees'].includes(item.id))
           .map((item) => {
           const active = current === item.id;
           return (

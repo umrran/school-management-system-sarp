@@ -26,7 +26,7 @@ export type Teacher = {
 export type Course = {
   id: string;
   name: string;
-  code: string;
+  code: string | null;
   description: string | null;
   teacher_id: string | null;
   level: string | null;
