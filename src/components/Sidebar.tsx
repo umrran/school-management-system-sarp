@@ -8,6 +8,7 @@ import {
   FileText,
   Receipt,
   LogOut,
+  X,
 } from 'lucide-react';
 import logo from '/Sarp_Logo.jpg';
 
@@ -45,20 +46,53 @@ type SidebarProps = {
   className?: string;
   role: 'admin' | 'teacher';
   teacherName?: string | null;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 };
 
-export function Sidebar({ current, onNavigate, className, role, teacherName }: SidebarProps) {
+export function Sidebar({
+  current,
+  onNavigate,
+  className,
+  role,
+  teacherName,
+  mobileOpen = false,
+  onMobileClose,
+}: SidebarProps) {
   return (
-    <aside className={`flex h-screen w-64 flex-col border-r border-slate-200 bg-white ${className ?? ''}`}>
-      <div className="flex items-center gap-3 px-6 py-5">
-        <img src={logo} alt="SARP Logo" className="h-12 w-12 rounded-xl object-cover" />
-        <div>
-          <h1 className="text-base font-bold leading-tight text-slate-800">SARP</h1>
-          <p className="text-xs text-slate-400">Educational Complex</p>
+    <>
+      {mobileOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation"
+          onClick={onMobileClose}
+          className="fixed inset-0 z-40 bg-slate-900/30 md:hidden"
+        />
+      )}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 md:static md:z-auto md:translate-x-0 md:transition-none ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${className ?? ''}`}
+      >
+        <div className="flex items-center justify-between gap-3 px-6 py-5">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="SARP Logo" className="h-12 w-12 rounded-xl object-cover" />
+            <div>
+              <h1 className="text-base font-bold leading-tight text-slate-800">SARP</h1>
+              <p className="text-xs text-slate-400">Educational Complex</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onMobileClose}
+            aria-label="Close navigation"
+            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 md:hidden"
+          >
+            <X size={20} />
+          </button>
         </div>
-      </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems
           .filter((item) => role === 'admin' || !['teachers', 'attendance', 'fees'].includes(item.id))
           .map((item) => {
@@ -67,7 +101,10 @@ export function Sidebar({ current, onNavigate, className, role, teacherName }: S
             <div key={item.id}>
               {item.dividerBefore && <div className="my-2 border-t border-slate-100" />}
               <button
-                onClick={() => onNavigate(item.id)}
+                onClick={() => {
+                  onNavigate(item.id);
+                  onMobileClose?.();
+                }}
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
                   active
                     ? 'bg-sky-50 text-sky-700'
@@ -80,9 +117,9 @@ export function Sidebar({ current, onNavigate, className, role, teacherName }: S
             </div>
           );
         })}
-      </nav>
+        </nav>
 
-      <div className="border-t border-slate-100 px-6 py-4">
+        <div className="border-t border-slate-100 px-6 py-4">
         <p className="mb-3 text-xs text-slate-400">
           {role === 'admin' 
             ? 'Administrator' 
@@ -102,7 +139,8 @@ export function Sidebar({ current, onNavigate, className, role, teacherName }: S
           <LogOut size={18} />
           Sign Out
         </button>
-      </div>
-    </aside>
+        </div>
+      </aside>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Menu } from 'lucide-react';
 import { Sidebar, type PageId } from '@/components/Sidebar';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -23,6 +24,7 @@ function App() {
   const [teacherName, setTeacherName] = useState<string | null>(
     () => localStorage.getItem('sarp_teacher_name') || null
   );
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   if (!role) {
     return (
@@ -48,10 +50,29 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 print:bg-white">
-      <Sidebar current={page} onNavigate={setPage} className="print:hidden" role={role} teacherName={teacherName} />
-      <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-6 py-8 print:max-w-none print:p-0">
+    <div className="flex min-h-screen bg-slate-50 text-slate-900 print:bg-white">
+      <Sidebar
+        current={page}
+        onNavigate={setPage}
+        className="print:hidden"
+        role={role}
+        teacherName={teacherName}
+        mobileOpen={mobileNavOpen}
+        onMobileClose={() => setMobileNavOpen(false)}
+      />
+      <main className="min-w-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8 print:max-w-none print:p-0">
+          <div className="mb-5 flex items-center gap-3 md:hidden print:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Open navigation"
+              className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 shadow-sm"
+            >
+              <Menu size={20} />
+            </button>
+            <span className="text-sm font-semibold text-slate-700">SARP Educational Complex</span>
+          </div>
           {page === 'dashboard' && <DashboardPage />}
           {page === 'students' && <StudentsPage teacherEmail={teacherEmail} />}
           {page === 'teachers' && role === 'admin' && <TeachersPage />}
