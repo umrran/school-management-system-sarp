@@ -17,7 +17,7 @@ export function ReportCardView({ card, onBack }: Props) {
   }
 
   return (
-    <div>
+    <div className="overflow-x-auto">
       <div className="mb-4 flex items-center gap-4 print:hidden">
         <button
           onClick={onBack}
@@ -98,7 +98,7 @@ export function ReportCardView({ card, onBack }: Props) {
 
           {/* Subject Table */}
           <div className="mt-3 overflow-x-auto">
-            <table className="w-full border-2 border-[#222222] text-sm">
+            <table className="min-w-full border-2 border-[#222222] text-sm">
               <thead>
                 <tr className="bg-[#30369C] text-white">
                   <th className="border border-[#222222] px-2 py-1.5 text-left font-semibold text-sm">Subject</th>

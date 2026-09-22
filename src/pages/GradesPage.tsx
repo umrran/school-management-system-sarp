@@ -282,7 +282,7 @@ export function GradesPage({ teacherEmail }: { teacherEmail?: string | null }) {
             return (
               <div
                 key={e.id}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
                 <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
                   <div className="flex items-center gap-3">
@@ -309,7 +309,7 @@ export function GradesPage({ teacherEmail }: { teacherEmail?: string | null }) {
                 {eGrades.length === 0 ? (
                   <p className="px-5 py-4 text-sm text-slate-400">No grades recorded yet.</p>
                 ) : (
-                  <table className="w-full text-left text-sm">
+                  <table className="min-w-full text-left text-sm">
                     <thead className="bg-slate-50/50 text-xs uppercase tracking-wide text-slate-500">
                       <tr>
                         <th className="px-5 py-2 font-medium">Assessment</th>

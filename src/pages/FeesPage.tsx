@@ -297,35 +297,35 @@ export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
           }
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table className="min-w-full text-left text-sm">
             <thead className="border-b border-slate-100 bg-slate-50/50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-5 py-3 font-medium">Receipt No</th>
-                <th className="px-5 py-3 font-medium">Student</th>
-                <th className="px-5 py-3 font-medium">Class</th>
-                <th className="px-5 py-3 font-medium">Amount</th>
-                <th className="px-5 py-3 font-medium">Method</th>
-                <th className="px-5 py-3 font-medium">Date</th>
-                <th className="px-5 py-3 text-right font-medium">Actions</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Receipt No</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Student</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Class</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Amount</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Method</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Date</th>
+                <th className="whitespace-nowrap px-5 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filtered.map((p) => (
                 <tr key={p.id} className="transition hover:bg-slate-50/50">
-                  <td className="px-5 py-3">
+                  <td className="whitespace-nowrap px-5 py-3">
                     <span className="font-mono text-xs font-semibold text-sky-700">{p.receipt_no}</span>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="whitespace-nowrap px-5 py-3">
                     <p className="font-medium text-slate-700">{p.student_name}</p>
                     <p className="text-xs text-slate-400">{p.term} · {p.academic_year}</p>
                   </td>
-                  <td className="px-5 py-3 text-slate-600">{p.class_form}</td>
-                  <td className="px-5 py-3 font-bold text-slate-800">GH¢{Number(p.amount).toLocaleString()}</td>
-                  <td className="px-5 py-3">
+                  <td className="whitespace-nowrap px-5 py-3 text-slate-600">{p.class_form}</td>
+                  <td className="whitespace-nowrap px-5 py-3 font-bold text-slate-800">GH¢{Number(p.amount).toLocaleString()}</td>
+                  <td className="whitespace-nowrap px-5 py-3">
                     <Badge color={methodColor[p.payment_method] ?? 'slate'}>{p.payment_method}</Badge>
                   </td>
-                  <td className="px-5 py-3 text-slate-500">
+                  <td className="whitespace-nowrap px-5 py-3 text-slate-500">
                     {new Date(p.payment_date).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',

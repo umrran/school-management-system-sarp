@@ -60,7 +60,7 @@ function App() {
         mobileOpen={mobileNavOpen}
         onMobileClose={() => setMobileNavOpen(false)}
       />
-      <main className="min-w-0 flex-1 overflow-y-auto">
+      <main className="min-w-0 flex-1 overflow-x-auto overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8 print:max-w-none print:p-0">
           <div className="mb-5 flex items-center gap-3 md:hidden print:hidden">
             <button

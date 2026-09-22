@@ -495,7 +495,7 @@ export function ReportCardEditor({ card, teacherEmail, onBack, onSaved, onPrint 
           <p className="text-xs text-slate-400">Class Score and Exam Score are each out of 50. Total and Grade auto-calculate.</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-800 text-white text-xs uppercase tracking-wide">
                 <th className="px-4 py-3 text-left font-semibold w-44">Subject</th>

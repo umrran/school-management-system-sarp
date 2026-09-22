@@ -109,20 +109,20 @@ export function EnrollmentsPage() {
           }
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table className="min-w-full text-left text-sm">
             <thead className="border-b border-slate-100 bg-slate-50/50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-5 py-3 font-medium">Student</th>
-                <th className="px-5 py-3 font-medium">Course</th>
-                <th className="px-5 py-3 font-medium">Enrolled On</th>
-                <th className="px-5 py-3 text-right font-medium">Actions</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Student</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Course</th>
+                <th className="whitespace-nowrap px-5 py-3 font-medium">Enrolled On</th>
+                <th className="whitespace-nowrap px-5 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filtered.map((e) => (
                 <tr key={e.id} className="transition hover:bg-slate-50/50">
-                  <td className="px-5 py-3">
+                  <td className="whitespace-nowrap px-5 py-3">
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-xs font-semibold text-sky-700">
                         {e.student.first_name[0]}
@@ -136,18 +136,18 @@ export function EnrollmentsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="whitespace-nowrap px-5 py-3">
                     <p className="font-medium text-slate-700">{e.course.name}</p>
                     <p className="text-xs text-violet-600">{e.course.code}</p>
                   </td>
-                  <td className="px-5 py-3 text-slate-500">
+                  <td className="whitespace-nowrap px-5 py-3 text-slate-500">
                     {new Date(e.enrolled_at).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
                     })}
                   </td>
-                  <td className="px-5 py-3 text-right">
+                  <td className="whitespace-nowrap px-5 py-3 text-right">
                     <button
                       onClick={() => setDeleteId(e.id)}
                       className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
