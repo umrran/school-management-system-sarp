@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { DEFAULT_SUBJECTS, calcGrade } from '@/types';
+import { getSubjectsByClass, calcGrade } from '@/types';
 import type { ReportCard, ReportCardSubject, Student } from '@/types';
 import { Button, Field, Select, TextInput } from '@/components/Form';
 import { ArrowLeft, Printer, Upload, X } from 'lucide-react';
@@ -25,8 +25,9 @@ type Props = {
   onPrint: (id: string) => void;
 };
 
-const emptySubjects = (): SubjectRow[] =>
-  DEFAULT_SUBJECTS.map((name, i) => ({
+const emptySubjects = (classForm: string = ''): SubjectRow[] => {
+  const subjectList = getSubjectsByClass(classForm);
+  return subjectList.map((name, i) => ({
     subject_name: name,
     class_score: '0',
     exam_score: '0',
@@ -36,54 +37,62 @@ const emptySubjects = (): SubjectRow[] =>
     teacher_remarks: '',
     sort_order: i,
   }));
+};
 
 export function ReportCardEditor({ card, teacherEmail, onBack, onSaved, onPrint }: Props) {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState(card?.student_id ?? '');
-
   const [form, setForm] = useState({
     pupil_name: card?.pupil_name ?? '',
     class_form: card?.class_form ?? '',
     term: card?.term ?? 'First Term',
-    academic_year: card?.academic_year ?? '2024',
+    academic_year: card?.academic_year ?? '',
     vacation_date: card?.vacation_date ?? '',
     reopening_date: card?.reopening_date ?? '',
-    next_term_fees: card?.next_term_fees ?? 'GH¢0.00',
-    fees_in_arrears: card?.fees_in_arrears ?? 'GH¢0.00',
-    total_fees_due: card?.total_fees_due ?? '0',
-    no_on_roll: String(card?.no_on_roll ?? 0),
-    days_out: String(card?.days_out ?? 0),
+    next_term_fees: card?.next_term_fees ?? '',
+    fees_in_arrears: card?.fees_in_arrears ?? '',
+    total_fees_due: card?.total_fees_due ?? '',
+    no_on_roll: String(card?.no_on_roll ?? ''),
+    days_out: String(card?.days_out ?? ''),
     repeated: card?.repeated ?? false,
     promoted_to: card?.promoted_to ?? '',
     overall_grade: card?.overall_grade ?? '',
-    attendance: String(card?.attendance ?? 0),
+    attendance: String(card?.attendance ?? ''),
     conduct: card?.conduct ?? '',
     interest: card?.interest ?? '',
     teachers_remarks: card?.teachers_remarks ?? '',
     headmaster_remarks: card?.headmaster_remarks ?? '',
   });
+
+  const [subjects, setSubjects] = useState<SubjectRow[]>(
+    card?.subjects
+      ? [...card.subjects]
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((s) => ({
+            id: s.id,
+            subject_name: s.subject_name,
+            class_score: String(s.class_score ?? 0),
+            exam_score: String(s.exam_score ?? 0),
+            total: s.total ?? 0,
+            grade: s.grade ?? 9,
+            grade_label: s.grade_label ?? '',
+            teacher_remarks: s.teacher_remarks ?? '',
+            sort_order: s.sort_order,
+          }))
+      : emptySubjects(card?.class_form ?? '')
+  );
+
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudentId, setSelectedStudentId] = useState<string>(card?.student_id ?? '');
   const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(card?.header_image_url ?? null);
   const [uploadingHeader, setUploadingHeader] = useState(false);
   const headerInputRef = useRef<HTMLInputElement>(null);
-
-  const [subjects, setSubjects] = useState<SubjectRow[]>(() => {
-    if (card?.subjects?.length) {
-      return card.subjects.map((s) => ({
-        id: s.id,
-        subject_name: s.subject_name,
-        class_score: String(s.class_score),
-        exam_score: String(s.exam_score),
-        total: s.total,
-        grade: s.grade,
-        grade_label: s.grade_label,
-        teacher_remarks: s.teacher_remarks,
-        sort_order: s.sort_order,
-      }));
-    }
-    return emptySubjects();
-  });
-
   const [saving, setSaving] = useState(false);
+
+  // Update subjects when class form changes (new report cards only)
+  useEffect(() => {
+    if (!card && form.class_form) {
+      setSubjects(emptySubjects(form.class_form));
+    }
+  }, [form.class_form, card]);
 
   useEffect(() => {
     async function loadStudents() {

@@ -9,6 +9,7 @@ import {
   Receipt,
   LogOut,
   X,
+  Clock,
 } from 'lucide-react';
 import logo from '/Sarp_Logo.jpg';
 
@@ -18,9 +19,11 @@ export type PageId =
   | 'teachers'
   | 'courses'
   | 'attendance'
+  | 'student-attendance'
   | 'grades'
   | 'report-cards'
-  | 'fees';
+  | 'fees'
+  | 'checkin';
 
 type NavItem = {
   id: PageId;
@@ -32,11 +35,13 @@ type NavItem = {
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { id: 'students', label: 'Students', icon: <GraduationCap size={20} /> },
-  { id: 'teachers', label: 'Teachers', icon: <Users size={20} /> },
-  { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
-  { id: 'attendance', label: 'Attendance', icon: <ClipboardList size={20} /> },
+  { id: 'student-attendance', label: 'Attendance', icon: <ClipboardList size={20} /> },
+  { id: 'checkin', label: 'Check In', icon: <Clock size={20} /> },
+  { id: 'attendance', label: 'Manage Attendance', icon: <ClipboardList size={20} /> },
   { id: 'grades', label: 'Grades', icon: <Award size={20} /> },
   { id: 'report-cards', label: 'Report Cards', icon: <FileText size={20} />, dividerBefore: true },
+  { id: 'teachers', label: 'Teachers', icon: <Users size={20} /> },
+  { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
   { id: 'fees', label: 'Fees & Receipts', icon: <Receipt size={20} /> },
 ];
 
@@ -94,7 +99,15 @@ export function Sidebar({
 
         <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems
-          .filter((item) => role === 'admin' || !['teachers', 'attendance', 'fees'].includes(item.id))
+          .filter((item) => {
+            if (role === 'admin') {
+              // Admins see everything except student-attendance (teacher only)
+              return item.id !== 'student-attendance' && item.id !== 'checkin';
+            } else {
+              // Teachers see: dashboard, students, student-attendance, checkin, grades, report-cards
+              return ['dashboard', 'students', 'student-attendance', 'checkin', 'grades', 'report-cards'].includes(item.id);
+            }
+          })
           .map((item) => {
           const active = current === item.id;
           return (

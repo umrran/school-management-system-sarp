@@ -100,6 +100,7 @@ export function AttendancePage() {
     if (!selectedTeacher) return;
 
     setSaving(true);
+    setSaved(false);
     const record = {
       teacher_id: selectedTeacher,
       enrollment_id: null,
@@ -107,20 +108,33 @@ export function AttendancePage() {
       status: attendanceMap[selectedTeacher] ?? 'present',
     };
 
-    const { data: existing } = await supabase
+    const { data: existing, error: lookupError } = await supabase
       .from('attendance')
       .select('id')
       .eq('teacher_id', selectedTeacher)
       .eq('date', date)
+      .limit(1)
       .maybeSingle();
 
-    if (existing) {
-      await supabase.from('attendance').update({ status: record.status }).eq('id', existing.id);
-    } else {
-      await supabase.from('attendance').insert(record);
+    let error: any = lookupError;
+    if (!error) {
+      if (existing) {
+        const result = await supabase.from('attendance').update({ status: record.status }).eq('id', existing.id);
+        error = result.error;
+      } else {
+        const result = await supabase.from('attendance').insert(record);
+        error = result.error;
+      }
     }
 
     setSaving(false);
+    if (error) {
+      alert(`Failed to save attendance: ${error.message}`);
+      return;
+    }
+
+    // Re-read from the server so the UI reflects what is actually stored.
+    await loadTeacherAttendance();
     setSaved(true);
   }
 

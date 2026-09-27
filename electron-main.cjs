@@ -1,4 +1,5 @@
 const path = require('path');
+const { app, BrowserWindow } = require('electron');
 
 try {
   console.log('Electron app starting...');

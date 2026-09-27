@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { FeePayment, Student } from '@/types';
+import type { FeePayment, Student, FeeBalance } from '@/types';
 import { numberToWords } from '@/types';
 import { Modal } from '@/components/Modal';
 import { EmptyState } from '@/components/EmptyState';
 import { Badge, ConfirmDialog, PageHeader, Spinner } from '@/components/ui';
 import { Button, Field, Select, TextInput, TextArea } from '@/components/Form';
-import { Receipt, Plus, Trash2, Search, Printer, Eye, TrendingUp } from 'lucide-react';
+import { Receipt, Plus, Trash2, Search, Printer, Eye, TrendingUp, AlertTriangle } from 'lucide-react';
 import { ReceiptView } from './ReceiptView';
 
 const CLASS_OPTIONS = [
@@ -29,13 +29,15 @@ type FeeWithStudent = FeePayment & { student: Student | null };
 export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
   const [payments, setPayments] = useState<FeeWithStudent[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [feeBalances, setFeeBalances] = useState<(FeeBalance & { student: Student | null })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [viewing, setViewing] = useState<FeeWithStudent | null>(null);
+  const [search, setSearch] = useState('');
   const [totalCollected, setTotalCollected] = useState(0);
+  const [totalOwed, setTotalOwed] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [viewing, setViewing] = useState<FeeWithStudent | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     student_id: '',
@@ -69,6 +71,7 @@ export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
       if (!teacherData || !teacherData.class) {
         setPayments([]);
         setStudents([]);
+        setFeeBalances([]);
         setLoading(false);
         return;
       }
@@ -83,6 +86,7 @@ export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
 
       if (!studentList || studentList.length === 0) {
         setPayments([]);
+        setFeeBalances([]);
         setLoading(false);
         return;
       }
@@ -97,6 +101,15 @@ export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
 
       setPayments(paymentData ?? []);
       setTotalCollected((paymentData ?? []).reduce((sum: number, p: any) => sum + Number(p.amount), 0));
+
+      // Load fee balances for students
+      const { data: balanceData } = await supabase
+        .from('student_fee_balances')
+        .select('*, student:students(*)')
+        .in('student_id', studentIds);
+
+      setFeeBalances(balanceData ?? []);
+      setTotalOwed((balanceData ?? []).reduce((sum: number, b: any) => sum + Number(b.balance), 0));
     } else {
       // Admin view: show all
       const { data } = await supabase
@@ -113,6 +126,16 @@ export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
         .order('last_name');
 
       setStudents(studentList ?? []);
+
+      // Load all fee balances
+      const { data: balanceData } = await supabase
+        .from('student_fee_balances')
+        .select('*, student:students(*)')
+        .gt('balance', 0)
+        .order('balance', { ascending: false });
+
+      setFeeBalances(balanceData ?? []);
+      setTotalOwed((balanceData ?? []).reduce((sum: number, b: any) => sum + Number(b.balance), 0));
     }
     
     setLoading(false);
@@ -257,19 +280,69 @@ export function FeesPage({ teacherEmail }: { teacherEmail?: string | null }) {
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
-              <Receipt size={20} />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600">
+              <AlertTriangle size={20} />
             </div>
             <div>
-              <p className="text-sm text-slate-500">This Term</p>
-              <p className="text-2xl font-bold text-slate-800">
-                {payments.filter((p) => p.term === 'First Term').length}
-              </p>
+              <p className="text-sm text-slate-500">Outstanding Fees</p>
+              <p className="text-2xl font-bold text-red-600">GH¢{totalOwed.toLocaleString()}</p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Students with Outstanding Fees */}
+      {feeBalances.length > 0 && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50/30 p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-2">
+            <AlertTriangle size={20} className="text-red-600" />
+            <h3 className="text-lg font-bold text-red-800">Students with Outstanding Fees</h3>
+            <Badge color="red">{feeBalances.filter((b) => b.balance > 0).length}</Badge>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="border-b border-red-200 bg-red-100/50 text-xs font-semibold text-red-700">
+                <tr>
+                  <th className="whitespace-nowrap px-4 py-2">Student</th>
+                  <th className="whitespace-nowrap px-4 py-2">Class</th>
+                  <th className="whitespace-nowrap px-4 py-2 text-right">Total Owed</th>
+                  <th className="whitespace-nowrap px-4 py-2 text-right">Paid</th>
+                  <th className="whitespace-nowrap px-4 py-2 text-right">Balance</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-red-100">
+                {feeBalances
+                  .filter((b) => b.balance > 0)
+                  .slice(0, 10)
+                  .map((balance) => (
+                    <tr key={balance.id} className="hover:bg-red-100/20">
+                      <td className="whitespace-nowrap px-4 py-2 font-medium">
+                        {balance.student
+                          ? `${balance.student.first_name} ${balance.student.last_name}`
+                          : 'Unknown'}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2">{balance.student?.class || 'N/A'}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-right font-semibold">
+                        GH¢{Number(balance.total_owed).toLocaleString()}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-right text-emerald-600">
+                        GH¢{Number(balance.total_paid).toLocaleString()}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-right font-bold text-red-600">
+                        GH¢{Number(balance.balance).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+          {feeBalances.filter((b) => b.balance > 0).length > 10 && (
+            <p className="mt-3 text-sm text-red-600">
+              Showing 10 of {feeBalances.filter((b) => b.balance > 0).length} students with outstanding fees
+            </p>
+          )}
+        </div>
+      )}
       <div className="mb-4 relative">
         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <input

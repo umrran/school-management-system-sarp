@@ -112,18 +112,6 @@ export type ReportCardSubject = {
   sort_order: number;
 };
 
-export const DEFAULT_SUBJECTS = [
-  'MATHEMATICS',
-  'ENG. LANGUAGE',
-  'INTEGRATED SCI.',
-  'HISTORY',
-  'COMPUTING',
-  'R.M.E',
-  'CREATIVE ART',
-  'GHANAIAN LAN.',
-  'OWOP',
-];
-
 export type FeePayment = {
   id: string;
   receipt_no: string;
@@ -140,6 +128,74 @@ export type FeePayment = {
   notes: string;
   created_at: string;
 };
+
+export type FeeBalance = {
+  id: string;
+  student_id: string;
+  total_owed: number;
+  total_paid: number;
+  balance: number;
+};
+
+export const DEFAULT_SUBJECTS = [
+  'MATHEMATICS',
+  'ENG. LANGUAGE',
+  'INTEGRATED SCI.',
+  'HISTORY',
+  'COMPUTING',
+  'R.M.E',
+  'CREATIVE ART',
+  'GHANAIAN LAN.',
+  'OWOP',
+];
+
+export function getSubjectsByClass(classForm: string): string[] {
+  const normalized = classForm?.toLowerCase().trim() || '';
+  
+  // Early Childhood Education (Nursery, KG1, KG2)
+  if (['nursery', 'kg1', 'kg2'].includes(normalized)) {
+    return [
+      'Literacy',
+      'OWOP',
+      'Creative Arts',
+      'Writing',
+      'Numeracy',
+    ];
+  }
+  
+  // Basic (BS1 - BS6)
+  if (['basic 1', 'basic 2', 'basic 3', 'basic 4', 'basic 5', 'basic 6', 'bs1', 'bs2', 'bs3', 'bs4', 'bs5', 'bs6'].includes(normalized)) {
+    return [
+      'Mathematics',
+      'English Language',
+      'Integrated Science',
+      'History',
+      'Computing',
+      'Religious & Moral Education (R.M.E)',
+      'Creative Arts',
+      'Ghanaian Language',
+      'Our World Our People (OWOP)',
+    ];
+  }
+  
+  // Junior High School (JHS1 - JHS3)
+  if (['jhs 1', 'jhs 2', 'jhs 3', 'jhs1', 'jhs2', 'jhs3'].includes(normalized)) {
+    return [
+      'English Language',
+      'Mathematics',
+      'Integrated Science',
+      'Social Studies',
+      'Computing',
+      'Career Technology',
+      'Creative Arts & Design',
+      'Religious & Moral Education (R.M.E)',
+      'Ghanaian Language',
+    ];
+  }
+  
+  // Fallback to default subjects
+  return DEFAULT_SUBJECTS;
+}
 
 export function numberToWords(n: number): string {
   if (n === 0) return 'Zero';

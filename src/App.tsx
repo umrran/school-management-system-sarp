@@ -10,6 +10,8 @@ import { AttendancePage } from '@/pages/AttendancePage';
 import { GradesPage } from '@/pages/GradesPage';
 import { ReportCardsPage } from '@/pages/ReportCardsPage';
 import { FeesPage } from '@/pages/FeesPage';
+import { CheckInPage } from '@/pages/CheckInPage';
+import { StudentAttendancePage } from '@/pages/StudentAttendancePage';
 
 const normalizeEmail = (value?: string | null) => (value ?? '').trim().toLowerCase();
 
@@ -78,9 +80,11 @@ function App() {
           {page === 'teachers' && role === 'admin' && <TeachersPage />}
           {page === 'courses' && <CoursesPage />}
           {page === 'attendance' && role === 'admin' && <AttendancePage />}
+{page === 'student-attendance' && role === 'teacher' && <StudentAttendancePage teacherEmail={teacherEmail} />}
           {page === 'grades' && <GradesPage teacherEmail={teacherEmail} />}
           {page === 'report-cards' && <ReportCardsPage teacherEmail={teacherEmail} />}
           {page === 'fees' && role === 'admin' && <FeesPage teacherEmail={teacherEmail} />}
+          {page === 'checkin' && role === 'teacher' && <CheckInPage teacherEmail={teacherEmail} />}
         </div>
       </main>
     </div>
